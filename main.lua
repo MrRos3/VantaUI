@@ -1,12 +1,12 @@
 --[[
-    VantaUI v0.3.3
+    VantaUI v0.3.4
     Roblox UI library by MrRos3.
 
     Source: https://github.com/MrRos3/VantaUI
     License: MIT
 ]]
 
-local PROJECT_VERSION = "0.3.3"
+local PROJECT_VERSION = "0.3.4"
 local CACHE_BUSTER = tostring(os.time()) .. "-" .. tostring(math.random(100000, 999999))
 local RUNTIME_URL = "https://raw.githubusercontent.com/MrRos3/VantaUI/refs/heads/main/dist/main.lua?v=" .. CACHE_BUSTER
 local BRAND_IMAGE_URL = "https://raw.githubusercontent.com/MrRos3/VantaUI/main/assets/vanta-brand-v2.jpeg"
@@ -322,7 +322,9 @@ local function applyDefaultBranding(config)
     if openButton.OnlyMobile == nil then
         openButton.OnlyMobile = false
     end
-    if openButton.OnlyIcon == nil then
+    if branding.UseDefault ~= false and branding.UseAsOpenButtonIcon ~= false then
+        openButton.OnlyIcon = true
+    elseif openButton.OnlyIcon == nil then
         openButton.OnlyIcon = true
     end
     if openButton.CornerRadius == nil then
@@ -395,6 +397,7 @@ function VantaUI:CreateWindow(config)
         function window:EditOpenButton(openButtonConfig)
             local brandedOpenButton = copyConfig(openButtonConfig)
             brandedOpenButton.Icon = branding.OpenButtonIcon or branding.Image or BRAND_IMAGE_URL
+            brandedOpenButton.OnlyIcon = true
             return BaseEditOpenButton(self, brandedOpenButton)
         end
 
