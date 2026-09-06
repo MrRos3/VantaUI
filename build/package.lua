@@ -3,7 +3,7 @@
 return [[
 {
     "name": "mrros3-vantaui",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "main": "./dist/main.lua",
     "repository": "https://github.com/MrRos3/VantaUI",
     "author": "MrRos3",

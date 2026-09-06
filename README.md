@@ -5,8 +5,17 @@ A polished AMOLED-first Roblox UI library by **MrRos3**.
 ## Loader
 
 ```lua
-local VantaUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/MrRos3/VantaUI/main/main.lua"))()
+local cacheBuster = tostring(os.time()) .. "-" .. tostring(math.random(100000, 999999))
+local VantaUI = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/MrRos3/VantaUI/main/main.lua?v=" .. cacheBuster
+))()
 ```
+
+## Vanta brand identity
+
+VantaUI v0.3.3 automatically uses the official Vanta artwork for the window's top-left icon and minimized/open badge. This applies even when an older script still supplies a normal or outdated icon. The current artwork uses a versioned asset filename so executor caches cannot restore an older badge.
+
+Custom branding remains possible with `Branding = { UseDefault = false, Image = "..." }`. Set `Branding = false` only when a script intentionally should not use Vanta branding.
 
 ## Interface sounds
 
@@ -24,6 +33,12 @@ Sounds = {
 ```
 
 Set `Sounds = false` to mute a window. The runtime also exposes `SetSoundEnabled`, `SetSoundVolume`, `SetSoundPitch`, and `SetSoundForEvent` for live changes.
+
+## v0.3.3
+
+- Official Vanta artwork is now the automatic window icon and minimized badge
+- Old script icon values are replaced unless Vanta branding is explicitly disabled
+- Versioned brand asset prevents stale executor image caches
 
 ## v0.3.2
 
@@ -53,7 +68,9 @@ Set `Sounds = false` to mute a window. The runtime also exposes `SetSoundEnabled
 ## Example
 
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/MrRos3/VantaUI/main/example.lua"))()
+loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/MrRos3/VantaUI/main/example.lua?v=" .. os.time()
+))()
 ```
 
 ## Project layout
