@@ -1,12 +1,12 @@
 --[[
-    VantaUI v0.3.4
+    VantaUI v0.3.5
     Roblox UI library by MrRos3.
 
     Source: https://github.com/MrRos3/VantaUI
     License: MIT
 ]]
 
-local PROJECT_VERSION = "0.3.4"
+local PROJECT_VERSION = "0.3.5"
 local CACHE_BUSTER = tostring(os.time()) .. "-" .. tostring(math.random(100000, 999999))
 local RUNTIME_URL = "https://raw.githubusercontent.com/MrRos3/VantaUI/refs/heads/main/dist/main.lua?v=" .. CACHE_BUSTER
 local BRAND_IMAGE_URL = "https://raw.githubusercontent.com/MrRos3/VantaUI/main/assets/vanta-brand-v2.jpeg"
@@ -29,7 +29,7 @@ VantaUI.RuntimeVersion = tostring(VantaUI.Version or PROJECT_VERSION)
 VantaUI.Version = PROJECT_VERSION
 VantaUI.Name = "VantaUI"
 VantaUI.DefaultTheme = "Salty Special"
-VantaUI.DefaultStartupTab = "Home"
+VantaUI.DefaultStartupTab = 1
 VantaUI.TransparencyValue = 0.1
 
 VantaUI.GuiInfo = {
@@ -382,7 +382,10 @@ function VantaUI:CreateWindow(config)
         config.Topbar.ButtonsType = "Mac"
     end
 
-    local startupTab = config.StartupTab or VantaUI.DefaultStartupTab
+    local startupTab = config.StartupTab
+    if startupTab == nil then
+        startupTab = VantaUI.DefaultStartupTab
+    end
     local window = BaseCreateWindow(self, config)
 
     window._UsesVantaThemeWallpaper = usesThemeWallpaper
@@ -413,7 +416,14 @@ function VantaUI:CreateWindow(config)
         tabConfig = tabConfig or {}
         local tab = BaseTab(self, tabConfig)
 
-        if not startupTabSelected and tostring(tabConfig.Title or "") == tostring(startupTab) then
+        local matchesStartupTab
+        if type(startupTab) == "number" then
+            matchesStartupTab = tab.Index == startupTab
+        else
+            matchesStartupTab = tostring(tabConfig.Title or "") == tostring(startupTab)
+        end
+
+        if not startupTabSelected and matchesStartupTab then
             startupTabSelected = true
             task.defer(function()
                 if not self.Destroyed and tab and tab.Index then

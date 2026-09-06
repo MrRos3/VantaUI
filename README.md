@@ -34,6 +34,11 @@ Sounds = {
 
 Set `Sounds = false` to mute a window. The runtime also exposes `SetSoundEnabled`, `SetSoundVolume`, `SetSoundPitch`, and `SetSoundForEvent` for live changes.
 
+## v0.3.5
+
+- Windows now start on the first-created tab by default, regardless of its title.
+- `StartupTab` can still select a different tab by its title or numeric position.
+
 ## v0.3.4
 
 - Keeps default Vanta minimized branding square and image-only after any later `EditOpenButton` call.

@@ -7,7 +7,6 @@ local Window = VantaUI:CreateWindow({
     Title = "VantaUI Showcase",
     Icon = VantaUI.Brand.Image,
     Theme = "Salty Special",
-    StartupTab = "Home",
     HideSearchBar = false,
     Branding = {
         Name = "VANTA",
