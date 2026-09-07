@@ -32,6 +32,10 @@ VantaUI.DefaultTheme = "Salty Special"
 VantaUI.DefaultStartupTab = 1
 VantaUI.TransparencyValue = 0.1
 
+-- Keep all interface sounds except notification open/close sounds.
+VantaUI:SetSoundForEvent("Notification", false)
+VantaUI:SetSoundForEvent("NotificationClose", false)
+
 VantaUI.GuiInfo = {
     Name = "VantaUI",
     Version = PROJECT_VERSION,
@@ -177,7 +181,6 @@ local LegacyThemeNames = {
 
 for _, theme in ipairs(VantaThemes) do
     VantaUI:AddTheme(theme)
-
     local legacyName = LegacyThemeNames[theme.Name]
     if legacyName then
         local legacyTheme = {}
