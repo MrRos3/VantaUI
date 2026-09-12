@@ -5,7 +5,7 @@
    \ V / (_| | | | | || (_| | |_| || |
     \_/ \__,_|_| |_|\__\__,_|\___/|___|
 
-    v0.3.5  |  2026-09-06  |  VantaUI - polished AMOLED-first Roblox UI library by MrRos3
+    v0.3.5  |  2026-09-12  |  VantaUI - polished AMOLED-first Roblox UI library by MrRos3
 
     Source: https://github.com/MrRos3/VantaUI
     Project: VantaUI by MrRos3
@@ -616,15 +616,45 @@ local i=a.load'a'local j=
 
 d.Heartbeat
 
-local l="https://raw.githubusercontent.com/Footagesus/Icons/main/Main-v2.lua"
+local l={
+"https://cdn.jsdelivr.net/gh/Footagesus/Icons@46d30c19ba7bc601d6ec794a48dc3a89568b1eec/Main-v2.lua",
+"https://raw.githubusercontent.com/Footagesus/Icons/46d30c19ba7bc601d6ec794a48dc3a89568b1eec/Main-v2.lua",
+}
 
 local m
-if d:IsStudio()or not writefile then
+if d:IsStudio()then
 m=a.load'b'
 else
-m=loadstring(
-game.HttpGet and game:HttpGet(l)or h:GetAsync(l)
-)()
+local iconErrors={}
+for _,iconUrl in ipairs(l)do
+local fetchOk,iconSource=pcall(function()
+return game.HttpGet and game:HttpGet(iconUrl)or h:GetAsync(iconUrl)
+end)
+if fetchOk and type(iconSource)=="string"and#iconSource>100 then
+iconSource=iconSource:gsub("return request and true or false","return true",1)
+iconSource=iconSource:gsub(
+"https://raw.githubusercontent.com/Footagesus/Icons/refs/heads/main/",
+"https://cdn.jsdelivr.net/gh/Footagesus/Icons@46d30c19ba7bc601d6ec794a48dc3a89568b1eec/"
+)
+local iconChunk,iconCompileError=loadstring(iconSource)
+if type(iconChunk)=="function"then
+local runOk,iconLibrary=pcall(iconChunk)
+if runOk and type(iconLibrary)=="table"and type(iconLibrary.SetIconsType)=="function"then
+m=iconLibrary
+break
+else
+table.insert(iconErrors,"runtime: "..tostring(iconLibrary))
+end
+else
+table.insert(iconErrors,"compile: "..tostring(iconCompileError))
+end
+else
+table.insert(iconErrors,"fetch: "..tostring(iconUrl))
+end
+end
+if type(m)~="table"then
+error("[VantaUI] Failed to load Lucide icon runtime: "..table.concat(iconErrors," | "),0)
+end
 end
 
 m.SetIconsType"lucide"
