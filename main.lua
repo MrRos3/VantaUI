@@ -2,9 +2,10 @@
     VantaUI
     Roblox UI library by MrRos3.
 
-    This entry point preserves the stable production VantaUI wrapper and adds
-    deterministic feature cleanup to every window. Pressing the red X runs all
-    registered cleanup work before the normal VantaUI destroy path finishes.
+    Production wrapper with deterministic shutdown cleanup.
+    Pressing the red X now performs two cleanup passes:
+      1) auto-reset Vanta controls (toggles/sliders)
+      2) run explicitly registered cleanup resources
 ]]
 
 local CACHE_BUSTER = tostring(os.time()) .. "-" .. tostring(math.random(100000, 999999))
@@ -22,6 +23,31 @@ assert(loader, "[VantaUI] Failed to compile the stable production base: " .. tos
 
 local VantaUI = loader()
 assert(type(VantaUI) == "table", "[VantaUI] Stable production base returned an invalid value")
+
+VantaUI.Version = "0.3.6"
+if type(VantaUI.GuiInfo) == "table" then
+    VantaUI.GuiInfo.Version = VantaUI.Version
+end
+
+local function cloneValue(value, seen)
+    if type(value) ~= "table" then
+        return value
+    end
+
+    seen = seen or {}
+    if seen[value] then
+        return seen[value]
+    end
+
+    local copy = {}
+    seen[value] = copy
+
+    for key, item in pairs(value) do
+        copy[cloneValue(key, seen)] = cloneValue(item, seen)
+    end
+
+    return copy
+end
 
 local function cleanupResource(resource, customCleanup)
     if customCleanup then
@@ -69,13 +95,97 @@ end
 
 local BaseCreateWindow = VantaUI.CreateWindow
 
+local FACTORY_METHODS = {
+    "Toggle",
+    "Slider",
+    "Dropdown",
+    "Colorpicker",
+    "Keybind",
+    "Input",
+    "Button",
+    "Paragraph",
+    "ProgressBar",
+    "Section",
+    "Group",
+    "HStack",
+    "VStack",
+    "Image",
+    "Code",
+    "Viewport",
+    "Divider",
+    "Space",
+}
+
 function VantaUI:CreateWindow(config)
     config = config or {}
 
     local window = BaseCreateWindow(self, config)
     local BaseDestroy = window.Destroy
+    local BaseTab = window.Tab
+
     local cleanupStack = {}
     local cleanupRan = false
+    local autoResetRan = false
+    local destroying = false
+
+    local elementBaselines = setmetatable({}, { __mode = "k" })
+    local elementOrder = {}
+    local wrappedContainers = setmetatable({}, { __mode = "k" })
+
+    local function captureElement(element)
+        if type(element) ~= "table" or elementBaselines[element] then
+            return element
+        end
+
+        local baseline = {
+            Type = element.__type,
+            HasValue = false,
+            Value = nil,
+        }
+
+        if element.__type == "Slider" and type(element.Value) == "table" then
+            baseline.HasValue = element.Value.Default ~= nil
+            baseline.Value = cloneValue(element.Value.Default)
+        elseif element.Value ~= nil then
+            baseline.HasValue = true
+            baseline.Value = cloneValue(element.Value)
+        end
+
+        elementBaselines[element] = baseline
+        table.insert(elementOrder, element)
+
+        return element
+    end
+
+    local wrapContainer
+    wrapContainer = function(container)
+        if type(container) ~= "table" or wrappedContainers[container] then
+            return container
+        end
+
+        wrappedContainers[container] = true
+
+        for _, factoryName in ipairs(FACTORY_METHODS) do
+            local baseFactory = container[factoryName]
+            if type(baseFactory) == "function" then
+                container[factoryName] = function(selfContainer, elementConfig)
+                    local element = baseFactory(selfContainer, elementConfig)
+                    captureElement(element)
+                    wrapContainer(element)
+                    return element
+                end
+            end
+        end
+
+        return container
+    end
+
+    if type(BaseTab) == "function" then
+        function window:Tab(tabConfig)
+            local tab = BaseTab(self, tabConfig)
+            return wrapContainer(tab)
+        end
+    end
 
     -- Register anything a feature needs to undo when the window is destroyed.
     -- Supported automatically:
@@ -96,7 +206,6 @@ function VantaUI:CreateWindow(config)
         return resource
     end
 
-    -- Friendly aliases for scripts that prefer different wording.
     window.AddCleanup = window.RegisterCleanup
     window.RegisterReset = window.RegisterCleanup
     window.TrackFeature = window.RegisterCleanup
@@ -109,8 +218,6 @@ function VantaUI:CreateWindow(config)
         return self:RegisterCleanup(instance)
     end
 
-    -- Snapshot one property before a feature changes it. Destroy restores the
-    -- exact value that existed before the feature touched it.
     function window:TrackProperty(instance, propertyName)
         if instance == nil or type(propertyName) ~= "string" then
             return nil
@@ -145,7 +252,6 @@ function VantaUI:CreateWindow(config)
         return originals
     end
 
-    -- Snapshot arbitrary script state with a getter and restore it with a setter.
     function window:TrackState(getter, setter)
         if type(getter) ~= "function" or type(setter) ~= "function" then
             return nil
@@ -163,13 +269,58 @@ function VantaUI:CreateWindow(config)
         return originalValue
     end
 
+    -- Best-effort automatic feature reset for ordinary Vanta scripts.
+    -- Toggles are always forced OFF and their callbacks are executed
+    -- synchronously. Sliders are restored to the value they had when created.
+    function window:ResetFeatures()
+        if autoResetRan then
+            return
+        end
+        autoResetRan = true
+
+        if config.AutoCleanupFeatures == false then
+            return
+        end
+
+        for index = #elementOrder, 1, -1 do
+            local element = elementOrder[index]
+            local baseline = elementBaselines[element]
+
+            if type(element) == "table" and baseline then
+                if baseline.Type == "Toggle" then
+                    if type(element.Set) == "function" then
+                        pcall(element.Set, element, false, false, true)
+                    end
+
+                    if type(element.Callback) == "function" then
+                        local success, err = pcall(element.Callback, false)
+                        if not success then
+                            warn("[VantaUI AutoReset] Toggle cleanup failed: " .. tostring(err))
+                        end
+                    end
+                elseif baseline.Type == "Slider" and baseline.HasValue then
+                    if type(element.Set) == "function" then
+                        local success, err = pcall(element.Set, element, cloneValue(baseline.Value))
+                        if not success then
+                            warn("[VantaUI AutoReset] Slider cleanup failed: " .. tostring(err))
+                        end
+                    elseif type(element.Callback) == "function" then
+                        local success, err = pcall(element.Callback, cloneValue(baseline.Value))
+                        if not success then
+                            warn("[VantaUI AutoReset] Slider callback cleanup failed: " .. tostring(err))
+                        end
+                    end
+                end
+            end
+        end
+    end
+
     function window:Cleanup()
         if cleanupRan then
             return
         end
         cleanupRan = true
 
-        -- Last-created resources are removed first so dependencies unwind safely.
         for index = #cleanupStack, 1, -1 do
             local entry = cleanupStack[index]
             cleanupStack[index] = nil
@@ -182,12 +333,17 @@ function VantaUI:CreateWindow(config)
     end
 
     function window:IsCleanupComplete()
-        return cleanupRan
+        return cleanupRan and autoResetRan
     end
 
-    -- The red X uses Window:Destroy(). Minimize still uses Window:Close(), so
-    -- minimizing does not disable active features. A real destroy does.
+    -- The red X uses Window:Destroy(). Minimize still uses Window:Close().
     function window:Destroy(...)
+        if destroying then
+            return
+        end
+        destroying = true
+
+        self:ResetFeatures()
         self:Cleanup()
 
         if BaseDestroy then
@@ -195,7 +351,6 @@ function VantaUI:CreateWindow(config)
         end
     end
 
-    -- Optional cleanup can also be supplied directly in CreateWindow config.
     if type(config.Cleanup) == "function" then
         window:RegisterCleanup(config.Cleanup)
     elseif type(config.Cleanup) == "table" then
