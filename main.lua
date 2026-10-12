@@ -1,5 +1,5 @@
 --[[
-    VantaUI v0.3.7
+    VantaUI v0.3.8
     Roblox UI library by MrRos3.
 
     Public production loader.
@@ -9,7 +9,7 @@
     - Notification open/close sounds are disabled by default.
 ]]
 
-local PROJECT_VERSION = "0.3.7"
+local PROJECT_VERSION = "0.3.8"
 local CACHE_BUSTER = tostring(os.time()) .. "-" .. tostring(math.random(100000, 999999))
 local RUNTIME_URL = "https://raw.githubusercontent.com/MrRos3/VantaUI/main/dist/main.lua?v=" .. CACHE_BUSTER
 local BRAND_IMAGE_URL = "https://raw.githubusercontent.com/MrRos3/VantaUI/main/assets/vanta-brand-v2.jpeg"
@@ -380,9 +380,9 @@ function VantaUI:CreateWindow(config)
     if config.Folder == nil then
         config.Folder = "VantaUI"
     end
-    if config.NewElements == nil then
-        config.NewElements = true
-    end
+    -- Retire legacy flat cards and the old search/sidebar presentation.
+    config.NewElements = true
+    config.HideSearchBar = true
     if config.Size == nil then
         config.Size = UDim2.fromOffset(620, 420)
     end
@@ -401,9 +401,8 @@ function VantaUI:CreateWindow(config)
     if config.Topbar.Height == nil then
         config.Topbar.Height = 44
     end
-    if config.Topbar.ButtonsType == nil then
-        config.Topbar.ButtonsType = "Mac"
-    end
+    -- Consistent compact three-dot topbar across existing script configs.
+    config.Topbar.ButtonsType = "Mac"
 
     local startupTab = config.StartupTab
     if startupTab == nil then
