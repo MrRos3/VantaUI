@@ -5,7 +5,7 @@
    \ V / (_| | | | | || (_| | |_| || |
     \_/ \__,_|_| |_|\__\__,_|\___/|___|
 
-    v0.3.7  |  2026-10-12  |  VantaUI - polished AMOLED-first Roblox UI library by MrRos3
+    v0.3.8  |  2026-10-12  |  VantaUI - polished AMOLED-first Roblox UI library by MrRos3
 
     Source: https://github.com/MrRos3/VantaUI
     Project: VantaUI by MrRos3
@@ -3081,7 +3081,7 @@ New=a.load'k'.New
 return[[
 {
     "name": "mrros3-vantaui",
-    "version": "0.3.7",
+    "version": "0.3.8",
     "private": false,
     "main": "./dist/main.lua",
     "repository": "https://github.com/MrRos3/VantaUI",
@@ -13698,12 +13698,12 @@ Branding=aw,
 BrandImage=ax,
 Folder=av.Folder,
 Resizable=av.Resizable~=false,
-Background=av.Background,
-BackgroundImageTransparency=av.BackgroundImageTransparency or 0,
+Background=av.Background or"https://raw.githubusercontent.com/MrRos3/VantaUI/main/assets/salty-special.png",
+BackgroundImageTransparency=av.BackgroundImageTransparency or 0.32,
 ShadowTransparency=av.ShadowTransparency or 0.6,
 User=av.User or{},
 Footer=av.Footer or{},
-Topbar=av.Topbar or{Height=52,ButtonsType="Default"},
+Topbar={Height=(typeof(av.Topbar)=="table"and av.Topbar.Height)or 44,ButtonsType="Mac"},
 
 Size=av.Size,
 
@@ -13716,11 +13716,11 @@ ToggleKey=av.ToggleKey,
 ElementsRadius=av.ElementsRadius,
 Radius=av.Radius or 16,
 Transparent=av.Transparent or false,
-HideSearchBar=av.HideSearchBar~=false,
+HideSearchBar=true,
 ScrollBarEnabled=av.ScrollBarEnabled or false,
 SideBarWidth=av.SideBarWidth or 200,
 Acrylic=av.Acrylic or false,
-NewElements=av.NewElements or false,
+NewElements=true,
 IgnoreAlerts=av.IgnoreAlerts or false,
 HidePanelBackground=av.HidePanelBackground or false,
 AutoScale=av.AutoScale~=false,
@@ -13772,7 +13772,7 @@ UIPadding=(aB.NewElements and 10 or 13),
 UICorner=aB.ElementsRadius or(aB.NewElements and 23 or 16),
 }
 
-local b=aB.Size or UDim2.new(0,580,0,460)
+local b=aB.Size or UDim2.fromOffset(620,420)
 aB.Size=UDim2.new(
 b.X.Scale,
 math.clamp(b.X.Offset,aB.MinSize.X,aB.MaxSize.X),
@@ -13781,7 +13781,7 @@ math.clamp(b.Y.Offset,aB.MinSize.Y,aB.MaxSize.Y)
 )
 
 if aB.Topbar=={}then
-aB.Topbar={Height=52,ButtonsType="Default"}
+aB.Topbar={Height=44,ButtonsType="Mac"}
 end
 
 if not ai:IsStudio()and aB.Folder and writefile then
