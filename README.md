@@ -4,9 +4,13 @@ A polished AMOLED-first Roblox UI library by **MrRos3**.
 
 ## Current version
 
-**VantaUI 0.3.7** is the only active production version in this repository.
+**VantaUI 0.3.8** is the only active production version in this repository.
 
 The public loader always uses the current `dist/main.lua` runtime. The old stable-base chaining used by earlier 0.3.x builds has been removed.
+
+## Modern UI by default
+
+The old plain flat-card layout is retired as the default. Both the public `main.lua` loader and direct `dist/main.lua` use the Salty Special black/red theme, floral wallpaper, translucent rounded cards, compact three-dot topbar and clean sidebar without the legacy search field. The official Vanta launcher icon is automatic. Existing window/tab/element APIs, explicit backgrounds, and alternate themes remain available.
 
 ## Loader
 
@@ -68,7 +72,7 @@ Set `Sounds = false` to mute the entire window.
 
 The runtime also exposes `SetSoundEnabled`, `SetSoundVolume`, `SetSoundPitch`, and `SetSoundForEvent` for live changes.
 
-## 0.3.7 production notes
+## 0.3.8 production notes
 
 - Public loader points directly at the current runtime
 - Executor compatibility repair is applied only when the raw dist runtime cannot compile directly
@@ -88,7 +92,7 @@ loadstring(game:HttpGet(
 
 ## Project layout
 
-- `main.lua` - current VantaUI 0.3.7 public loader and customization layer
+- `main.lua` - current VantaUI 0.3.8 public loader and customization layer
 - `dist/main.lua` - current compiled runtime
 - `src/` - editable UI source
 - `build/` - build tooling
