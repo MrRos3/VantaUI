@@ -5,7 +5,7 @@
    \ V / (_| | | | | || (_| | |_| || |
     \_/ \__,_|_| |_|\__\__,_|\___/|___|
 
-    v0.3.7  |  2026-09-12  |  VantaUI - polished AMOLED-first Roblox UI library by MrRos3
+    v0.3.7  |  2026-10-12  |  VantaUI - polished AMOLED-first Roblox UI library by MrRos3
 
     Source: https://github.com/MrRos3/VantaUI
     Project: VantaUI by MrRos3
@@ -15861,7 +15861,7 @@ return aB
 end end end
 
 local aa={
-Name="Gui",
+Name="VantaUI",
 Window=nil,
 Theme=nil,
 Creator=a.load'd',
@@ -15978,7 +15978,7 @@ Scale=aa.UIScale,
 aa.UIScaleObj=aA
 
 aa.ScreenGui=at("ScreenGui",{
-Name="Gui",
+Name="VantaUI",
 Parent=aw,
 IgnoreGuiInset=true,
 ScreenInsets="None",
@@ -16006,19 +16006,19 @@ Name="ToolTips",
 })
 
 aa.NotificationGui=at("ScreenGui",{
-Name="Gui/Notifications",
+Name="VantaUI/Notifications",
 Parent=aw,
 IgnoreGuiInset=true,
 DisplayOrder=ax+3,
 })
 aa.DropdownGui=at("ScreenGui",{
-Name="Gui/Dropdowns",
+Name="VantaUI/Dropdowns",
 Parent=aw,
 IgnoreGuiInset=true,
 DisplayOrder=ax+2,
 })
 aa.TooltipGui=at("ScreenGui",{
-Name="Gui/Tooltips",
+Name="VantaUI/Tooltips",
 Parent=aw,
 IgnoreGuiInset=true,
 DisplayOrder=ax+1,
@@ -16237,6 +16237,30 @@ end
 
 aa.Themes=a.load'w'(aa,as)
 
+aa.Themes["Salty Special"]={
+Name="Salty Special",
+Accent=Color3.fromHex"#12070A",
+Dialog=Color3.fromHex"#0A0709",
+Outline=Color3.fromHex"#5A1824",
+Text=Color3.fromHex"#FFFFFF",
+Placeholder=Color3.fromHex"#9A9AA3",
+Background=Color3.fromHex"#000000",
+Button=Color3.fromHex"#251016",
+Icon=Color3.fromHex"#E2DDE0",
+Toggle=Color3.fromHex"#A1162F",
+Slider=Color3.fromHex"#A1162F",
+Checkbox=Color3.fromHex"#D23A57",
+Primary=Color3.fromHex"#A1162F",
+SliderIcon=Color3.fromHex"#F1E3E7",
+PanelBackground=Color3.fromHex"#050406",
+PanelBackgroundTransparency=0.42,
+LabelBackground=Color3.fromHex"#0A080A",
+LabelBackgroundTransparency=0.08,
+ElementBackground=Color3.fromHex"#151116",
+ElementBackgroundTransparency=0.16,
+}
+
+
 aa.Themes["Gui Dark"]={
 Name="Gui Dark",
 Accent=Color3.fromHex"#151923",
@@ -16308,11 +16332,17 @@ ElementBackgroundTransparency=0,
 
 as.Themes=aa.Themes
 
-aa:SetTheme"Gui Dark"
+aa:SetTheme"Salty Special"
 aa:SetLanguage(as.Language)
 
 function aa.CreateWindow(aC,aD)
+aD=aD or{}
 local b=a.load'af'
+if aD.Branding==nil then
+local d="https://raw.githubusercontent.com/MrRos3/VantaUI/main/assets/vanta-brand-v2.jpeg"
+aD.Branding={Name="VANTA",Image=d,WindowIcon=d,OpenButtonIcon=d,
+IconSize=24,IconRadius=7,OpenButtonIconRadius=8}
+end
 
 if not am:IsStudio()and writefile then
 if not isfolder"Gui"then
@@ -16345,7 +16375,7 @@ aa:ConfigureSounds(d)
 
 local f=true
 
-local g=aa.Themes[aD.Theme or"Gui Dark"]
+local g=aa.Themes[aD.Theme or"Salty Special"]or aa.Theme
 
 
 as.SetTheme(g)
