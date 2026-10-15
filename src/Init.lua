@@ -477,7 +477,7 @@ function WindUI:CreateWindow(Config)
 	Config = Config or {}
 	local CreateWindow = require("./components/window/Init")
 	if Config.Branding == nil then
-		local brand = "https://raw.githubusercontent.com/MrRos3/VantaUI/main/assets/vanta-brand-v2.jpeg"
+		local brand = "https://raw.githubusercontent.com/MrRos3/VantaUI/main/assets/vanta-brand-v2-original.jpeg?v=original-valid-20261015"
 		Config.Branding = { Name = "VANTA", Image = brand, WindowIcon = brand, OpenButtonIcon = brand,
 			IconSize = 24, IconRadius = 7, OpenButtonIconRadius = 8 }
 	end

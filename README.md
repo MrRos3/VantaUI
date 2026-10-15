@@ -37,6 +37,20 @@ Branding = {
 
 Set `Branding = false` only when a script intentionally should not use Vanta branding.
 
+## Approved visual styling
+
+The production UI includes the accepted VantaTest improvements:
+
+- Independent icon colors for tabs, buttons, section headings and notifications (`IconColor = Color3.fromHex("#...")`)
+- A colorful nine-tab interactive showcase, without changing the VantaUI API
+- OLED-black lower-right notification cards with a full-height deep-burgundy (`#251016`) timeout overlay
+- A complete, original-resolution official Vanta brand image for the launcher badge and topbar
+- Repaired remote-image caching and image element parenting
+
+The minimalist window handles, drag grip and progress-track styling keep their original colors. Only UI glyphs are tinted; the Vanta artwork retains its original colors.
+
+To run the older three-tab sample, load `example-basic.lua` instead of `example.lua`.
+
 ## Default theme
 
 The production default is **Salty Special**.

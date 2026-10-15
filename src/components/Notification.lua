@@ -3,8 +3,9 @@ local New = Creator.New
 local Tween = Creator.Tween
 
 local NotificationModule = {
-	Size = UDim2.new(0, 300, 1, -100 - 56),
-	SizeLower = UDim2.new(0, 300, 1, -56),
+	-- Lower-right notification stack with a 29px bottom/right safe margin.
+	Size = UDim2.new(0, 300, 1, -96),
+	SizeLower = UDim2.new(0, 300, 1, -84),
 	UICorner = 18,
 	UIPadding = 14,
 	--ButtonPadding = 9,
@@ -53,6 +54,7 @@ function NotificationModule.New(Config)
 		Title = Config.Title or "Notification",
 		Content = Config.Content or nil,
 		Icon = Config.Icon or nil,
+		IconColor = Config.IconColor,
 		IconThemed = Config.IconThemed,
 		Background = Config.Background,
 		BackgroundImageTransparency = Config.BackgroundImageTransparency,
@@ -108,6 +110,9 @@ function NotificationModule.New(Config)
 			"Notification",
 			Notification.IconThemed
 		)
+		if Notification.IconColor and Icon.ImageLabel then
+			Icon.ImageLabel.ImageColor3 = Notification.IconColor
+		end
 		Icon.Size = UDim2.new(0, 26, 0, 26)
 		Icon.Position = UDim2.new(0, NotificationModule.UIPadding, 0, NotificationModule.UIPadding)
 		-- Icon.LayoutOrder = -1
@@ -138,13 +143,12 @@ function NotificationModule.New(Config)
 		})
 	end
 
+	-- Original full-height countdown overlay, now in muted dark red.
+	-- The parent clips its width down to zero over the notification duration.
 	local Duration = Creator.NewRoundFrame(NotificationModule.UICorner, "Squircle", {
 		Size = UDim2.new(0, 0, 1, 0),
-		ThemeTag = {
-			ImageTransparency = "NotificationDurationTransparency",
-			ImageColor3 = "NotificationDuration",
-		},
-		--Visible = false,
+		ImageColor3 = Color3.fromHex("#251016"),
+		ImageTransparency = 0,
 	})
 
 	local TextContainer = New("Frame", {
@@ -205,19 +209,11 @@ function NotificationModule.New(Config)
 		Position = UDim2.new(2, 0, 1, 0),
 		AnchorPoint = Vector2.new(0, 1),
 		AutomaticSize = "Y",
-		ImageTransparency = 0.05,
-		ThemeTag = {
-			ImageColor3 = "Notification",
-		},
+		-- Solid OLED black, independent of the selected UI theme.
+		ImageColor3 = Color3.fromRGB(0, 0, 0),
+		ImageTransparency = 0,
 		--ZIndex = 20
 	}, {
-		Creator.NewRoundFrame(NotificationModule.UICorner, "Squircle", {
-			Size = UDim2.new(1, 0, 1, 0),
-			ThemeTag = {
-				ImageColor3 = "Notification2",
-				ImageTransparency = "Notification2Transparency",
-			},
-		}),
 		New("Frame", {
 			Size = UDim2.new(1, 0, 1, 0),
 			BackgroundTransparency = 1,
