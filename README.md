@@ -41,6 +41,9 @@ Set `Branding = false` only when a script intentionally should not use Vanta bra
 
 The production UI includes the accepted VantaTest improvements:
 
+- Crimson01 HD (1671×941) default wallpaper with smooth separately animated native crimson petals and embers (no GIF sprite jitter)
+- Softly fading left-to-right active tab highlight, with extra transparency on the left and no solid outline
+
 - Original theme-colored Lucide icons on tabs, buttons, section headings and notifications
 - A nine-tab interactive showcase, without changing the VantaUI API
 - OLED-black lower-right notification cards with a full-height deep-burgundy (`#251016`) timeout overlay
@@ -63,7 +66,7 @@ Built-in themes:
 - Vanta AMOLED
 - Vanta Violet
 
-Salty Special automatically uses the Vanta wallpaper when the window does not provide a custom background.
+Salty Special automatically uses the Crimson01 HD wallpaper with ambient particles when the window does not provide a custom background. Other backgrounds and themes remain supported.
 
 ## Interface sounds
 

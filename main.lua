@@ -13,7 +13,7 @@ local PROJECT_VERSION = "0.3.8"
 local CACHE_BUSTER = tostring(os.time()) .. "-" .. tostring(math.random(100000, 999999))
 local RUNTIME_URL = "https://raw.githubusercontent.com/MrRos3/VantaUI/main/dist/main.lua?v=" .. CACHE_BUSTER
 local BRAND_IMAGE_URL = "https://raw.githubusercontent.com/MrRos3/VantaUI/main/assets/vanta-brand-v2-original.jpeg?v=original-valid-20261015"
-local SALTY_SPECIAL_WALLPAPER_URL = "https://raw.githubusercontent.com/MrRos3/VantaUI/main/assets/salty-special.png"
+local SALTY_SPECIAL_WALLPAPER_URL = "https://raw.githubusercontent.com/MrRos3/VantaUI/main/assets/crimson01-hq.jpg?v=crimson01-hq-native-20261021"
 local SALTY_SPECIAL_WALLPAPER_TRANSPARENCY = 0.32
 
 local function patchRuntime(source)
@@ -106,6 +106,12 @@ local VantaThemes = {
         LabelBackgroundTransparency = 0.08,
         ElementBackground = Color3.fromHex("#151116"),
         ElementBackgroundTransparency = 0.16,
+        -- Let the Crimson01 artwork show through; selection fades away to the right.
+        TabBackgroundActive = Color3.fromHex("#0B0A0C"),
+        TabBackgroundActiveTransparency = 1,
+        TabBackgroundHover = Color3.fromHex("#151013"),
+        TabBackgroundHoverTransparency = 0.82,
+        TabSelectionFade = Color3.fromHex("#4A1C2B"),
     },
     {
         Name = "Vanta Smoked",
@@ -233,6 +239,73 @@ if type(VantaUI.SetSoundForEvent) == "function" then
     end)
 end
 
+-- Smooth GPU-friendly ambience above the SHARP, motionless Crimson01 painting.
+-- Native UI particles avoid GIF frame jitter, pixelation and duplicate anime faces.
+local RunService = game:GetService("RunService")
+local function attachCrimsonAmbient(window)
+    local main = window and window.UIElements and window.UIElements.Main
+    local backdrop = main and main:FindFirstChild("Background")
+    if not backdrop or backdrop:FindFirstChild("Crimson01Ambient") then return end
+
+    local overlay = Instance.new("Frame")
+    overlay.Name = "Crimson01Ambient"
+    overlay.Size = UDim2.fromScale(1, 1)
+    overlay.BackgroundTransparency = 1
+    overlay.ClipsDescendants = true
+    overlay.Active = false
+    overlay.ZIndex = math.max(backdrop.ZIndex + 1, 2)
+    overlay.Parent = backdrop
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 16)
+    corner.Parent = overlay
+
+    local flecks = {}
+    for i = 1, 18 do
+        local petal = i <= 12
+        local p = Instance.new("Frame")
+        p.Name = petal and "Petal" or "Ember"
+        p.BorderSizePixel = 0
+        p.Active = false
+        p.Size = UDim2.fromOffset(petal and (5 + i % 4 * 2) or (2 + i % 2), petal and (3 + i % 3) or 3)
+        p.AnchorPoint = Vector2.new(0.5, 0.5)
+        p.BackgroundColor3 = petal and Color3.fromRGB(207, 23, 46) or Color3.fromRGB(255, 75, 65)
+        p.BackgroundTransparency = petal and 0.38 or 0.50
+        p.ZIndex = overlay.ZIndex + 1
+        p.Parent = overlay
+        local round = Instance.new("UICorner")
+        round.CornerRadius = UDim.new(1, 0)
+        round.Parent = p
+        flecks[i] = {
+            item = p, petal = petal,
+            phase = ((i * 29) % 47) / 47,
+            x = ((i * 37) % 107) / 107,
+            speed = 0.045 + i % 5 * 0.011,
+            drift = (i % 2 == 0 and 1 or -1) * (0.075 + i % 4 * 0.021),
+        }
+    end
+
+    local startTime = os.clock()
+    local connection
+    connection = RunService.RenderStepped:Connect(function()
+        if window.Destroyed or not overlay.Parent then
+            if connection then connection:Disconnect(); connection = nil end
+            return
+        end
+        if window.Closed or not main.Visible then return end
+        local t = os.clock() - startTime
+        for _, f in ipairs(flecks) do
+            local progress = (t * f.speed + f.phase) % 1
+            local x = f.x + progress * f.drift + 0.012 * math.sin(t * 0.65 + f.phase * math.pi * 2)
+            local y = -0.07 + progress * 1.14
+            f.item.Position = UDim2.fromScale(x, y)
+            f.item.Rotation = (t * (f.petal and 24 or 9) + f.phase * 360) % 360
+            f.item.BackgroundTransparency = (f.petal and 0.28 or 0.42)
+                + 0.42 * math.abs(2 * progress - 1)
+        end
+    end)
+end
+
 local ActiveWindows = setmetatable({}, { __mode = "k" })
 
 local function applyThemeWallpaper(window, themeName)
@@ -240,7 +313,7 @@ local function applyThemeWallpaper(window, themeName)
         return
     end
 
-    local transparency = themeName == "Salty Special" and SALTY_SPECIAL_WALLPAPER_TRANSPARENCY or 1
+    local transparency = SALTY_SPECIAL_WALLPAPER_TRANSPARENCY
     if type(window.SetBackgroundImageTransparency) == "function" then
         window:SetBackgroundImageTransparency(transparency)
     end
@@ -389,12 +462,12 @@ function VantaUI:CreateWindow(config)
 
     applyDefaultBranding(config)
 
-    local usesThemeWallpaper = config.Background == nil
+    local usesThemeWallpaper = config.Background == nil and config.AnimatedBackground == nil
     if usesThemeWallpaper then
+        -- Draw the original full-resolution painting once. Never animate its pixels:
+        -- shifting and upscaling a 224x126 GIF frame caused visible blur/shaking.
         config.Background = SALTY_SPECIAL_WALLPAPER_URL
-        config.BackgroundImageTransparency = config.Theme == "Salty Special"
-                and SALTY_SPECIAL_WALLPAPER_TRANSPARENCY
-            or 1
+        config.BackgroundImageTransparency = SALTY_SPECIAL_WALLPAPER_TRANSPARENCY
     end
 
     config.Topbar = config.Topbar or {}
@@ -413,6 +486,7 @@ function VantaUI:CreateWindow(config)
     window._UsesVantaThemeWallpaper = usesThemeWallpaper
     ActiveWindows[window] = true
     applyThemeWallpaper(window, config.Theme)
+    if usesThemeWallpaper then attachCrimsonAmbient(window) end
 
     local BaseTab = window.Tab
     local startupTabSelected = false
