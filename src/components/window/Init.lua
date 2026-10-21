@@ -61,7 +61,7 @@ return function(Config)
 		BrandImage = BrandImage,
 		Folder = Config.Folder,
 		Resizable = Config.Resizable ~= false,
-		Background = Config.Background or "https://raw.githubusercontent.com/MrRos3/VantaUI/main/assets/salty-special.png",
+		Background = Config.Background or "https://raw.githubusercontent.com/MrRos3/VantaUI/main/assets/crimson01-hq.jpg?v=crimson01-hq-native-20261021",
 		BackgroundImageTransparency = Config.BackgroundImageTransparency or 0.32,
 		ShadowTransparency = Config.ShadowTransparency or 0.6,
 		User = Config.User or {},
