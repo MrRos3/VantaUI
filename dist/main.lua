@@ -5,7 +5,7 @@
    \ V / (_| | | | | || (_| | |_| || |
     \_/ \__,_|_| |_|\__\__,_|\___/|___|
 
-    v0.3.8  |  2026-10-15  |  VantaUI - polished AMOLED-first Roblox UI library by MrRos3
+    v0.3.8  |  2026-10-21  |  VantaUI - polished AMOLED-first Roblox UI library by MrRos3
 
     Source: https://github.com/MrRos3/VantaUI
     Project: VantaUI by MrRos3
@@ -517,6 +517,7 @@ TabIconTransparencyActive=0.1,
 TabBorderTransparency=1,
 TabBorderTransparencyActive=0.75,
 TabBorder="White",
+TabSelectionFade="TabBackgroundActive",
 
 ElementBackground="Text",
 ElementBackgroundTransparency=0.93,
@@ -12437,6 +12438,35 @@ PaddingBottom=UDim.new(0,ar.TabPaddingY),
 }),
 },true)
 
+
+
+ar.UIElements.SelectionFade=al("Frame",{
+Name="SelectionFade",
+Parent=ar.UIElements.Main,
+Size=UDim2.fromScale(1,1),
+Position=UDim2.fromScale(0,0),
+BackgroundTransparency=1,
+BorderSizePixel=0,
+Active=false,
+ZIndex=ar.UIElements.Main.ZIndex,
+ThemeTag={BackgroundColor3="TabSelectionFade"},
+},{
+al("UICorner",{
+CornerRadius=UDim.new(0,ar.UICorner),
+}),
+al("UIGradient",{
+Rotation=0,
+Transparency=NumberSequence.new{
+NumberSequenceKeypoint.new(0.00,0.40),
+NumberSequenceKeypoint.new(0.22,0.58),
+NumberSequenceKeypoint.new(0.50,0.84),
+NumberSequenceKeypoint.new(0.82,1.00),
+NumberSequenceKeypoint.new(1.00,1.00),
+},
+}),
+})
+ar.UIElements.Main.Frame.ZIndex=ar.UIElements.Main.ZIndex+1
+
 local at=0
 local au
 local av
@@ -12672,7 +12702,7 @@ end)
 end
 
 ak.AddSignal(ar.UIElements.Main.MouseEnter,function()
-if not ar.Locked then
+if not ar.Locked and not ar.Selected then
 ak.SetThemeTag(ar.UIElements.Main.Frame,{
 ImageTransparency="TabBackgroundHoverTransparency",
 ImageColor3="TabBackgroundHover",
@@ -12696,7 +12726,7 @@ aw=nil
 end
 end
 
-if not ar.Locked then
+if not ar.Locked and not ar.Selected then
 ak.SetThemeTag(ar.UIElements.Main.Frame,{
 ImageTransparency="TabBorderTransparency",
 },0.1)
@@ -12867,6 +12897,13 @@ ao.SelectedTab=aq
 for ar,as in next,ao.Tabs do
 if not as.Locked then
 ak.SetThemeTag(as.UIElements.Main,{
+ImageColor3="TabBackground",
+ImageTransparency="TabBorderTransparency",
+},0.15)
+ak.Tween(as.UIElements.SelectionFade,0.16,{
+BackgroundTransparency=1,
+},Enum.EasingStyle.Quart,Enum.EasingDirection.Out):Play()
+ak.SetThemeTag(as.UIElements.Main.Frame,{
 ImageTransparency="TabBorderTransparency",
 },0.15)
 if as.Border then
@@ -12888,7 +12925,13 @@ end
 ak.SetThemeTag(ao.Tabs[aq].UIElements.Main,{
 ImageColor3="TabBackgroundActive",
 ImageTransparency="TabBackgroundActiveTransparency",
-},0.15)
+},0.16)
+ak.Tween(ao.Tabs[aq].UIElements.SelectionFade,0.18,{
+BackgroundTransparency=0,
+},Enum.EasingStyle.Quart,Enum.EasingDirection.Out):Play()
+ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Frame,{
+ImageTransparency="TabBorderTransparency",
+},0.12)
 if ao.Tabs[aq].Border then
 ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Outline,{
 ImageTransparency="TabBorderTransparencyActive",
@@ -13717,7 +13760,7 @@ Branding=aw,
 BrandImage=ax,
 Folder=av.Folder,
 Resizable=av.Resizable~=false,
-Background=av.Background or"https://raw.githubusercontent.com/MrRos3/VantaUI/main/assets/salty-special.png",
+Background=av.Background or"https://raw.githubusercontent.com/MrRos3/VantaUI/main/assets/crimson01-hq.jpg?v=crimson01-hq-native-20261021",
 BackgroundImageTransparency=av.BackgroundImageTransparency or 0.32,
 ShadowTransparency=av.ShadowTransparency or 0.6,
 User=av.User or{},
@@ -16277,6 +16320,12 @@ LabelBackground=Color3.fromHex"#0A080A",
 LabelBackgroundTransparency=0.08,
 ElementBackground=Color3.fromHex"#151116",
 ElementBackgroundTransparency=0.16,
+
+TabBackgroundActive=Color3.fromHex"#0B0A0C",
+TabBackgroundActiveTransparency=1,
+TabBackgroundHover=Color3.fromHex"#151013",
+TabBackgroundHoverTransparency=0.82,
+TabSelectionFade=Color3.fromHex"#4A1C2B",
 }
 
 
