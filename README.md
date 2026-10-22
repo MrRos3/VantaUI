@@ -41,7 +41,7 @@ Set `Branding = false` only when a script intentionally should not use Vanta bra
 
 The production UI includes the accepted VantaTest improvements:
 
-- Crimson01 HD (1671×941) default wallpaper with smooth separately animated native crimson petals and embers (no GIF sprite jitter)
+- Crimson01 HD (1671×941) default wallpaper, with **50 native animated particles**: 18 crimson petals, 17 rising embers, 10 softly floating red motes, and 5 subtle twinkles (no GIF sprite jitter)
 - Softly fading left-to-right active tab highlight, with extra transparency on the left and no solid outline
 
 - Original theme-colored Lucide icons on tabs, buttons, section headings and notifications
@@ -67,6 +67,8 @@ Built-in themes:
 - Vanta Violet
 
 Salty Special automatically uses the Crimson01 HD wallpaper with ambient particles when the window does not provide a custom background. Other backgrounds and themes remain supported.
+
+The **Crimson01 living atmosphere** updates a fixed particle pool at up to 30 FPS using one RenderStepped listener per window. The high-resolution background itself stays perfectly sharp and stationary. The overlay is clipped to the window, never captures mouse input, and pauses whenever the window is minimized. Petals and embers hide **immediately** on Close/Minimize, even while the 0.9-second window animation finishes; reopening resumes motion without a sudden jump. Destroy disconnects the listener.
 
 ## Interface sounds
 
