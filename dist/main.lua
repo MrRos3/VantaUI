@@ -5,7 +5,7 @@
    \ V / (_| | | | | || (_| | |_| || |
     \_/ \__,_|_| |_|\__\__,_|\___/|___|
 
-    v0.3.8  |  2026-10-21  |  VantaUI - polished AMOLED-first Roblox UI library by MrRos3
+    v0.3.8  |  2026-10-23  |  VantaUI - polished AMOLED-first Roblox UI library by MrRos3
 
     Source: https://github.com/MrRos3/VantaUI
     Project: VantaUI by MrRos3
@@ -7990,7 +7990,7 @@ al.UIElements.SliderIcon,
 av,
 af("TextBox",{
 Size=UDim2.new(0,al.TextBoxWidth,0,0),
-TextXAlignment="Left",
+TextXAlignment="Right",
 Text=FormatValue(ap),
 ThemeTag={
 TextColor3="Text",
@@ -8000,7 +8000,7 @@ AutomaticSize="Y",
 TextSize=15,
 FontFace=Font.new(ae.Font,Enum.FontWeight.Medium),
 BackgroundTransparency=1,
-LayoutOrder=-1,
+LayoutOrder=1,
 Visible=al.IsTextbox,
 }),
 })
