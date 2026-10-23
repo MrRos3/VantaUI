@@ -176,7 +176,7 @@ function Element:New(Config)
 		IconTo,
 		New("TextBox", {
 			Size = UDim2.new(0, Slider.TextBoxWidth, 0, 0),
-			TextXAlignment = "Left",
+			TextXAlignment = "Right",
 			Text = FormatValue(Value),
 			ThemeTag = {
 				TextColor3 = "Text",
@@ -186,7 +186,7 @@ function Element:New(Config)
 			TextSize = 15,
 			FontFace = Font.new(Creator.Font, Enum.FontWeight.Medium),
 			BackgroundTransparency = 1,
-			LayoutOrder = -1,
+			LayoutOrder = 1,
 			Visible = Slider.IsTextbox,
 		}),
 	})
