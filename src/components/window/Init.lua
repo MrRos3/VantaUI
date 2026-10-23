@@ -135,7 +135,7 @@ return function(Config)
 		UICorner = Window.ElementsRadius or (Window.NewElements and 23 or 16),
 	}
 
-	local WindowSize = Window.Size or UDim2.fromOffset(620, 420)
+	local WindowSize = Window.Size or UDim2.fromOffset(601, 403)
 	Window.Size = UDim2.new(
 		WindowSize.X.Scale,
 		math.clamp(WindowSize.X.Offset, Window.MinSize.X, Window.MaxSize.X),
