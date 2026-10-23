@@ -7978,7 +7978,7 @@ BackgroundTransparency=1,
 Parent=al.SliderFrame.UIElements.Main,
 },{
 af("UIListLayout",{
-Padding=UDim.new(0,al.Title~=nil and 8 or 12),
+Padding=UDim.new(0,al.Title~=nil and 4 or 8),
 FillDirection="Horizontal",
 VerticalAlignment="Center",
 HorizontalAlignment=al.Icons
@@ -8000,7 +8000,7 @@ AutomaticSize="Y",
 TextSize=15,
 FontFace=Font.new(ae.Font,Enum.FontWeight.Medium),
 BackgroundTransparency=1,
-LayoutOrder=1,
+LayoutOrder=-1,
 Visible=al.IsTextbox,
 }),
 })
