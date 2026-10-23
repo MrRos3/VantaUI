@@ -164,7 +164,7 @@ function Element:New(Config)
 		Parent = Slider.SliderFrame.UIElements.Main,
 	}, {
 		New("UIListLayout", {
-			Padding = UDim.new(0, Slider.Title ~= nil and 8 or 12),
+			Padding = UDim.new(0, Slider.Title ~= nil and 4 or 8),
 			FillDirection = "Horizontal",
 			VerticalAlignment = "Center",
 			HorizontalAlignment = Slider.Icons
@@ -186,7 +186,7 @@ function Element:New(Config)
 			TextSize = 15,
 			FontFace = Font.new(Creator.Font, Enum.FontWeight.Medium),
 			BackgroundTransparency = 1,
-			LayoutOrder = 1,
+			LayoutOrder = -1,
 			Visible = Slider.IsTextbox,
 		}),
 	})
