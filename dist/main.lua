@@ -13834,7 +13834,7 @@ UIPadding=(aB.NewElements and 10 or 13),
 UICorner=aB.ElementsRadius or(aB.NewElements and 23 or 16),
 }
 
-local b=aB.Size or UDim2.fromOffset(620,420)
+local b=aB.Size or UDim2.fromOffset(601,403)
 aB.Size=UDim2.new(
 b.X.Scale,
 math.clamp(b.X.Offset,aB.MinSize.X,aB.MaxSize.X),
