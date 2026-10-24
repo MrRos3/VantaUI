@@ -5,7 +5,7 @@
    \ V / (_| | | | | || (_| | |_| || |
     \_/ \__,_|_| |_|\__\__,_|\___/|___|
 
-    v0.3.8  |  2026-10-23  |  VantaUI - polished AMOLED-first Roblox UI library by MrRos3
+    v0.3.8  |  2026-10-24  |  VantaUI - polished AMOLED-first Roblox UI library by MrRos3
 
     Source: https://github.com/MrRos3/VantaUI
     Project: VantaUI by MrRos3
@@ -7844,8 +7844,11 @@ UIElements={},
 IsFocusing=false,
 
 Width=ak.Width or 130,
-TextBoxWidth=ak.Window.NewElements and 40 or 30,
+
+TextBoxWidth=ak.Window.NewElements and 48 or 38,
 ThumbSize=16,
+ThumbClearance=10,
+ValueGap=ak.Window.NewElements and 16 or 12,
 IconSize=26,
 }
 if al.Icons=={}then
@@ -7934,7 +7937,13 @@ Tags=ak.Tags,
 
 al.UIElements.SliderIcon=ae.NewRoundFrame(99,"Squircle",{
 ImageTransparency=0.88,
-Size=UDim2.new(1,not al.IsTextbox and-aw or(-al.TextBoxWidth-8),0,3),
+
+
+Size=UDim2.new(1,
+al.IsTextbox
+and-(al.TextBoxWidth+al.ValueGap+al.ThumbClearance)
+or-(aw+al.ThumbClearance),
+0,3),
 AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
 Name="Frame",
@@ -7978,7 +7987,7 @@ BackgroundTransparency=1,
 Parent=al.SliderFrame.UIElements.Main,
 },{
 af("UIListLayout",{
-Padding=UDim.new(0,al.Title~=nil and 4 or 8),
+Padding=UDim.new(0,al.Title~=nil and al.ValueGap or 8),
 FillDirection="Horizontal",
 VerticalAlignment="Center",
 HorizontalAlignment=al.Icons
@@ -7991,13 +8000,14 @@ av,
 af("TextBox",{
 Size=UDim2.new(0,al.TextBoxWidth,0,0),
 TextXAlignment="Right",
+TextTruncate=Enum.TextTruncate.None,
 Text=FormatValue(ap),
 ThemeTag={
 TextColor3="Text",
 },
 TextTransparency=0.4,
 AutomaticSize="Y",
-TextSize=15,
+TextSize=14,
 FontFace=Font.new(ae.Font,Enum.FontWeight.Medium),
 BackgroundTransparency=1,
 LayoutOrder=-1,
