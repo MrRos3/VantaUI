@@ -30,8 +30,11 @@ function Element:New(Config)
 		IsFocusing = false,
 
 		Width = Config.Width or 130,
-		TextBoxWidth = Config.Window.NewElements and 40 or 30,
+		-- Leave enough width for decimal values and the slider handle at Min.
+		TextBoxWidth = Config.Window.NewElements and 48 or 38,
 		ThumbSize = 16,
+		ThumbClearance = 10,
+		ValueGap = Config.Window.NewElements and 16 or 12,
 		IconSize = 26,
 	}
 	if Slider.Icons == {} then
@@ -120,7 +123,13 @@ function Element:New(Config)
 
 	Slider.UIElements.SliderIcon = Creator.NewRoundFrame(99, "Squircle", {
 		ImageTransparency = 0.88,
-		Size = UDim2.new(1, not Slider.IsTextbox and -TotalSliderWidth or (-Slider.TextBoxWidth - 8), 0, 3),
+		-- The thumb is centered on the track, so it extends beyond both ends.
+		-- Reserve the value label + full left-side clearance and right thumb radius.
+		Size = UDim2.new(1,
+			Slider.IsTextbox
+				and -(Slider.TextBoxWidth + Slider.ValueGap + Slider.ThumbClearance)
+				or -(TotalSliderWidth + Slider.ThumbClearance),
+			0, 3),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		Name = "Frame",
@@ -164,7 +173,7 @@ function Element:New(Config)
 		Parent = Slider.SliderFrame.UIElements.Main,
 	}, {
 		New("UIListLayout", {
-			Padding = UDim.new(0, Slider.Title ~= nil and 4 or 8),
+			Padding = UDim.new(0, Slider.Title ~= nil and Slider.ValueGap or 8),
 			FillDirection = "Horizontal",
 			VerticalAlignment = "Center",
 			HorizontalAlignment = Slider.Icons
@@ -177,13 +186,14 @@ function Element:New(Config)
 		New("TextBox", {
 			Size = UDim2.new(0, Slider.TextBoxWidth, 0, 0),
 			TextXAlignment = "Right",
+			TextTruncate = Enum.TextTruncate.None,
 			Text = FormatValue(Value),
 			ThemeTag = {
 				TextColor3 = "Text",
 			},
 			TextTransparency = 0.4,
 			AutomaticSize = "Y",
-			TextSize = 15,
+			TextSize = 14,
 			FontFace = Font.new(Creator.Font, Enum.FontWeight.Medium),
 			BackgroundTransparency = 1,
 			LayoutOrder = -1,

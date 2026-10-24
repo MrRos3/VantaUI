@@ -49,6 +49,7 @@ The production UI includes the accepted VantaTest improvements:
 - OLED-black lower-right notification cards with a full-height deep-burgundy (`#251016`) timeout overlay
 - A complete, original-resolution official Vanta brand image for the launcher badge and topbar
 - Repaired remote-image caching and image element parenting
+- Re-spaced value sliders so the decimal label stays clear of the thumb at minimum and maximum positions, with dedicated handle clearance
 
 The window handles, drag grip, progress tracks and icons use the original theme styling; the Vanta artwork retains its original colors.
 
