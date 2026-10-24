@@ -109,7 +109,204 @@ add(Home, "Paragraph", {
     Desc = "VantaUI v" .. tostring(VantaUI.Version) .. " | Theme: Salty Special | Interactive controls, built on VantaUI production.",
 })
 add(Home, "Divider", {})
-add(Home, "Section", { Title = "What's inside", Desc = "Buttons, toggles, keybinds, sliders, progress bars, dropdowns, text inputs, color pickers, themes, layouts, images, a viewport and code blocks." })
+add(Home, "Section", { Title = "What's inside", Desc = "Nameplate, buttons, toggles, keybinds, sliders, progress bars, dropdowns, text inputs, themes, layouts, images, a viewport and code blocks." })
+
+-- NAMEPLATE ------------------------------------------------------------------
+-- Use the exact owl PNG uploaded to VantaUI GitHub (with a native fallback).
+-- Older all-player Vanta owl overlays are cleaned up by the new module.
+local NameplateTab = tab("Nameplate", "user-round", "Owl | Your own overhead nameplate")
+add(NameplateTab, "Section", {
+    Title = "Vanta Owl",
+    Desc = "Two monochrome owls, one display name, only above your character.",
+    Icon = "user-round",
+})
+local NameplateModule
+local NameplateController
+local okNameplate, nameplateError = pcall(function()
+    local moduleSource = game:HttpGet(BASE .. "nameplate.lua?v=" .. versionToken)
+    NameplateModule = assert(loadstring(moduleSource))()
+    assert(type(NameplateModule.new) == "function", "Nameplate module is not ready")
+    NameplateController = NameplateModule.new({
+        Enabled = true,
+        Scale = 100,
+        MaxDistance = 60,
+        Height = 2.5,
+    })
+end)
+if not okNameplate then
+    warn("[VantaUI LAB / Nameplate] " .. tostring(nameplateError))
+    add(NameplateTab, "Paragraph", {
+        Title = "Nameplate couldn't load",
+        Desc = tostring(nameplateError),
+    })
+end
+local function updateNameplate(method, value)
+    if not NameplateController then
+        toast("Nameplate", "Nameplate module is unavailable.", "alert-triangle", 3)
+        return
+    end
+    local ok, err = pcall(function()
+        NameplateController[method](NameplateController, value)
+    end)
+    if not ok then
+        warn("[VantaUI LAB / Nameplate] " .. tostring(err))
+        toast("Nameplate error", tostring(err), "alert-triangle", 4)
+    end
+end
+local nameplateVisible = true
+local nameplateToggle
+local topbarEyeButton
+local topbarEyeParts
+
+local function syncNameplateVisibility(show, fromTopbar)
+    if not NameplateController then
+        toast("Nameplate", "Nameplate isn't available.", "alert-triangle", 3)
+        return
+    end
+    nameplateVisible = not not show
+    updateNameplate("SetEnabled", nameplateVisible)
+    if fromTopbar and nameplateToggle and type(nameplateToggle.Set) == "function" then
+        -- Synchronize the visual toggle without calling its callback a second time.
+        nameplateToggle:Set(nameplateVisible, false, true)
+    end
+    if topbarEyeParts then
+        local eyeColor = nameplateVisible
+            and Color3.fromRGB(255, 77, 112) or Color3.fromRGB(155, 149, 155)
+        topbarEyeParts.Stroke.Color = eyeColor
+        topbarEyeParts.Iris.BackgroundColor3 = eyeColor
+        topbarEyeParts.Slash.Visible = not nameplateVisible
+    end
+    if topbarEyeButton then
+        topbarEyeButton:SetAttribute("NameplateVisible", nameplateVisible)
+        topbarEyeButton:SetAttribute("Tooltip", nameplateVisible
+            and "Hide nameplate" or "Show nameplate")
+    end
+end
+
+nameplateToggle = add(NameplateTab, "Toggle", {
+    Title = "Show nameplate",
+    Desc = "Synced with the eye button beside the window traffic lights",
+    Value = true,
+    Callback = function(value) syncNameplateVisibility(value, false) end,
+})
+
+-- The button uses native UI shapes; it can't become blank from private image IDs.
+-- This is a small eye control immediately LEFT of the Mac traffic dots.
+local rightOk, rightError = pcall(function()
+    local right = Window.UIElements.Main.Main.Topbar.Right
+    assert(right and right:FindFirstChildOfClass("UIListLayout"), "Topbar right-side layout unavailable")
+    local slot = Instance.new("Frame")
+    slot.Name = "NameplateVisibilitySlot"
+    slot.Size = UDim2.fromOffset(27, 24)
+    slot.BackgroundTransparency = 1
+    slot.LayoutOrder = 996 -- existing Mac dots start at 997; eye sits adjacent
+    slot.Parent = right
+
+    local button = Instance.new("TextButton")
+    button.Name = "NameplateVisibilityButton"
+    button.Size = UDim2.fromOffset(23, 23)
+    button.Position = UDim2.fromOffset(2, 0)
+    button.BackgroundColor3 = Color3.fromRGB(18, 15, 20)
+    button.BackgroundTransparency = 0.08
+    button.AutoButtonColor = true
+    button.Text = ""
+    button.BorderSizePixel = 0
+    button.ZIndex = 10000
+    button.Parent = slot
+    local radius = Instance.new("UICorner")
+    radius.CornerRadius = UDim.new(0, 8)
+    radius.Parent = button
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(122, 49, 68)
+    border.Transparency = 0.22
+    border.Thickness = 1
+    border.Parent = button
+
+    -- Pure Roblox eye icon: outlined almond/oval, pupil, optional strike-through.
+    local eye = Instance.new("Frame")
+    eye.Name = "NativeEye"
+    eye.BackgroundTransparency = 1
+    eye.BorderSizePixel = 0
+    eye.Size = UDim2.fromOffset(16, 10)
+    eye.AnchorPoint = Vector2.new(0.5, 0.5)
+    eye.Position = UDim2.fromScale(0.5, 0.5)
+    eye.ZIndex = 10001
+    eye.Parent = button
+    local curve = Instance.new("UICorner")
+    curve.CornerRadius = UDim.new(1, 0)
+    curve.Parent = eye
+    local edge = Instance.new("UIStroke")
+    edge.Name = "EyeOutline"
+    edge.Color = Color3.fromRGB(255, 77, 112)
+    edge.Thickness = 1.7
+    edge.Transparency = 0
+    edge.Parent = eye
+    local pupil = Instance.new("Frame")
+    pupil.Name = "EyePupil"
+    pupil.BackgroundColor3 = edge.Color
+    pupil.BorderSizePixel = 0
+    pupil.AnchorPoint = Vector2.new(0.5, 0.5)
+    pupil.Position = UDim2.fromScale(0.5, 0.5)
+    pupil.Size = UDim2.fromOffset(5, 5)
+    pupil.ZIndex = 10002
+    pupil.Parent = eye
+    local pupilCurve = Instance.new("UICorner")
+    pupilCurve.CornerRadius = UDim.new(1, 0)
+    pupilCurve.Parent = pupil
+    local slash = Instance.new("Frame")
+    slash.Name = "HiddenSlash"
+    slash.Visible = false
+    slash.BorderSizePixel = 0
+    slash.BackgroundColor3 = Color3.fromRGB(220, 210, 218)
+    slash.AnchorPoint = Vector2.new(0.5, 0.5)
+    slash.Position = UDim2.fromScale(0.5, 0.5)
+    slash.Size = UDim2.fromOffset(19, 2)
+    slash.Rotation = -40
+    slash.ZIndex = 10003
+    slash.Parent = button
+    local slashCurve = Instance.new("UICorner")
+    slashCurve.CornerRadius = UDim.new(1, 0)
+    slashCurve.Parent = slash
+    topbarEyeButton = button
+    topbarEyeParts = { Stroke = edge, Iris = pupil, Slash = slash }
+    button:SetAttribute("Tooltip", "Hide nameplate")
+    button:SetAttribute("NameplateVisible", true)
+    button.MouseButton1Click:Connect(function()
+        syncNameplateVisibility(not nameplateVisible, true)
+    end)
+end)
+if not rightOk then
+    warn("[VantaUI LAB / Nameplate topbar] " .. tostring(rightError))
+end
+add(NameplateTab, "Paragraph", {
+    Title = "Your owl image",
+    Desc = "Uses your PNG included in VantaUI GitHub. Executors with getcustomasset show the actual white owl on both sides; otherwise an owl emoji appears so nothing is blank.",
+})
+add(NameplateTab, "Slider", {
+    Title = "Nameplate size",
+    Desc = "Scale the complete card without changing your character",
+    Value = { Min = 70, Max = 140, Default = 100 },
+    Step = 5,
+    Callback = function(value) updateNameplate("SetScale", value) end,
+})
+add(NameplateTab, "Slider", {
+    Title = "Height above head",
+    Desc = "Adjust upward offset in tenths of a stud",
+    Value = { Min = 15, Max = 45, Default = 25 },
+    Step = 1,
+    Callback = function(value) updateNameplate("SetHeight", value / 10) end,
+})
+add(NameplateTab, "Slider", {
+    Title = "Visibility distance",
+    Desc = "Owls and name fade together beyond 40 studs",
+    Value = { Min = 30, Max = 150, Default = 60 },
+    Step = 10,
+    Callback = function(value) updateNameplate("SetDistance", value) end,
+})
+add(NameplateTab, "Paragraph", {
+    Title = "Local-only display",
+    Desc = "Only YOUR character gets the owl plate. Previous all-player Vanta Owl nameplates are cleaned up. Exact PNG rendering needs getcustomasset/getsynasset or a Roblox image ID.",
+})
 
 -- BUTTONS --------------------------------------------------------------------
 local Buttons = tab("Buttons", "mouse-pointer-2", "Clickable elements, locking and notifications")

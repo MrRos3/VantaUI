@@ -45,7 +45,7 @@ The production UI includes the accepted VantaTest improvements:
 - Softly fading left-to-right active tab highlight, with extra transparency on the left and no solid outline
 
 - Original theme-colored Lucide icons on tabs, buttons, section headings and notifications
-- A nine-tab interactive showcase, without changing the VantaUI API
+- A ten-tab interactive showcase, without changing the VantaUI API
 - OLED-black lower-right notification cards with a full-height deep-burgundy (`#251016`) timeout overlay
 - A complete, original-resolution official Vanta brand image for the launcher badge and topbar
 - Repaired remote-image caching and image element parenting
@@ -54,6 +54,16 @@ The production UI includes the accepted VantaTest improvements:
 The window handles, drag grip, progress tracks and icons use the original theme styling; the Vanta artwork retains its original colors.
 
 To run the older three-tab sample, load `example-basic.lua` instead of `example.lua`.
+
+## Vanta Owl nameplate 🦉
+
+The **Nameplate** tab in [`example.lua`](example.lua) displays your own overhead owl plate and provides visibility, size, height and distance controls. The eye button near the window's top-right controls toggles the plate on and off and stays synchronized with the Nameplate tab's toggle. This feature is local-only: other players do not receive Vanta nameplates.
+
+The finished capsule is **44px tall**, solid `#050506` with rounded ends. Its **2px border** uses a white `UIStroke` with a dark crimson `#5A0A1C` gradient and narrow `#FF3355` highlight that rotates every **3 seconds**. A separate transparent frame holds the two 30px owls, placed 18px from each edge, and the centered **Michroma 14px** display name. The red `#FF1A3D` name has a white shine that sweeps for **1.4 seconds**, then stays fully red for **2.5 seconds**. The plate auto-sizes to the name, fades with distance, and cleans up its animations on respawn or PlayerRemoving. No extra plate decorations or glow are added.
+
+The included [owl PNG](assets/owl/vanta_owl_96.png) is downloaded from **VantaUI's own repository** by [`nameplate.lua`](nameplate.lua), registered through `getcustomasset` or `getsynasset` when supported, with an owl emoji fallback otherwise. The identical [standalone version](nameplate_standalone.lua) is also available. In Roblox Studio without custom asset APIs, upload the owl art as a Roblox image asset and set `OWL_IMAGE` to its `rbxassetid://` ID.
+
+This integration adds the owl feature without replacing VantaUI's existing runtime, themes, controls, Crimson01 wallpaper or particle animations inside the main window.
 
 ## Default theme
 
@@ -116,7 +126,11 @@ loadstring(game:HttpGet(
 - `dist/main.lua` - current compiled runtime
 - `src/` - editable UI source
 - `build/` - build tooling
-- `example.lua` - showcase and test script
+- `example.lua` - interactive showcase, including the owl Nameplate tab
+- `nameplate.lua` and `nameplate_standalone.lua` - owl nameplate implementations
+- `assets/owl/vanta_owl_96.png` - bundled monochrome owl art
+- `tests/nameplate_mock.lua` - local-only nameplate regression test
+- `.github/workflows/check-nameplate.yml` - nameplate CI checks
 - `.github/workflows/build-gui.yml` - automatic source build
 
 There are no separate legacy runtime files kept as active versions. Older releases remain only in Git history.
