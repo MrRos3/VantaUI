@@ -80,9 +80,14 @@ local function clearPreviousVantaUI()
     for _, owner in ipairs(owners) do
         if not seen[owner] then
             seen[owner] = true
-            for _, child in ipairs(owner:GetChildren()) do
-                if child:IsA("ScreenGui") and own[child.Name] then
-                    child:Destroy()
+            -- Some executors protect CoreGui enumeration. Failure to list
+            -- one container must never prevent the library from loading.
+            local ok, children = pcall(function() return owner:GetChildren() end)
+            if ok and children then
+                for _, child in ipairs(children) do
+                    if child:IsA("ScreenGui") and own[child.Name] then
+                        pcall(function() child:Destroy() end)
+                    end
                 end
             end
         end
