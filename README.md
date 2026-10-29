@@ -37,6 +37,10 @@ Branding = {
 
 Set `Branding = false` only when a script intentionally should not use Vanta branding.
 
+## Approved VantaTest color and notification update
+
+Production now carries the selected VantaTest refinements: the Salty Special accent and checkbox are `#A1162F`, the active tab remains a transparent burgundy fade, and OLED notifications receive a full-height themed countdown gradient, a soft icon pop and a smooth overshoot entrance. The default dark outer rim is disabled, while an explicit `ShadowTransparency` setting still works. Reloading the public loader clears previous VantaUI windows so old topbar dividers or shadows do not remain visible. **Original VantaUI buttons, toggles and sliders are unchanged**, including the production-only slider label/clearance fixes. The production owl nameplate and branding remain intact.
+
 ## Approved visual styling
 
 The production UI includes the accepted VantaTest improvements:

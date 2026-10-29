@@ -377,7 +377,7 @@ WindUI.Themes = require("./themes/Init")(WindUI, Creator)
 
 WindUI.Themes["Salty Special"] = {
 	Name = "Salty Special",
-	Accent = Color3.fromHex("#12070A"),
+	Accent = Color3.fromHex("#A1162F"),
 	Dialog = Color3.fromHex("#0A0709"),
 	Outline = Color3.fromHex("#5A1824"),
 	Text = Color3.fromHex("#FFFFFF"),
@@ -387,7 +387,7 @@ WindUI.Themes["Salty Special"] = {
 	Icon = Color3.fromHex("#E2DDE0"),
 	Toggle = Color3.fromHex("#A1162F"),
 	Slider = Color3.fromHex("#A1162F"),
-	Checkbox = Color3.fromHex("#D23A57"),
+	Checkbox = Color3.fromHex("#A1162F"),
 	Primary = Color3.fromHex("#A1162F"),
 	SliderIcon = Color3.fromHex("#F1E3E7"),
 	PanelBackground = Color3.fromHex("#050406"),

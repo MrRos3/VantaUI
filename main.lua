@@ -51,6 +51,45 @@ if not loader then
 end
 assert(loader, "[VantaUI] Failed to compile the current runtime: " .. tostring(loadError))
 
+-- Retire stale production windows before loading a new UI. Other script GUIs
+-- and VantaTest remain untouched.
+local function clearPreviousVantaUI()
+    local environment
+    if type(getgenv) == "function" then
+        local ok, result = pcall(getgenv)
+        if ok and type(result) == "table" then environment = result end
+    end
+    if environment and type(environment.__VANTAUI_CLEANUP) == "function" then
+        pcall(environment.__VANTAUI_CLEANUP)
+        environment.__VANTAUI_CLEANUP = nil
+    end
+    local owners, seen = {}, {}
+    if type(gethui) == "function" then
+        local ok, owner = pcall(gethui)
+        if ok and owner then owners[#owners + 1] = owner end
+    end
+    local coreOK, coreGui = pcall(function() return game:GetService("CoreGui") end)
+    if coreOK and coreGui then owners[#owners + 1] = coreGui end
+    local player = game:GetService("Players").LocalPlayer
+    local playerGui = player and player:FindFirstChildOfClass("PlayerGui")
+    if playerGui then owners[#owners + 1] = playerGui end
+    local own = {
+        ["VantaUI"] = true, ["VantaUI/Notifications"] = true,
+        ["VantaUI/Dropdowns"] = true, ["VantaUI/Tooltips"] = true,
+    }
+    for _, owner in ipairs(owners) do
+        if not seen[owner] then
+            seen[owner] = true
+            for _, child in ipairs(owner:GetChildren()) do
+                if child:IsA("ScreenGui") and own[child.Name] then
+                    child:Destroy()
+                end
+            end
+        end
+    end
+end
+clearPreviousVantaUI()
+
 local runtimeOk, VantaUI = pcall(loader)
 assert(runtimeOk and type(VantaUI) == "table", "[VantaUI] Current runtime returned an invalid value: " .. tostring(VantaUI))
 
@@ -87,7 +126,7 @@ VantaUI.Assets = {
 local VantaThemes = {
     {
         Name = "Salty Special",
-        Accent = Color3.fromHex("#12070A"),
+        Accent = Color3.fromHex("#A1162F"),
         Dialog = Color3.fromHex("#0A0709"),
         Outline = Color3.fromHex("#5A1824"),
         Text = Color3.fromHex("#FFFFFF"),
@@ -97,7 +136,7 @@ local VantaThemes = {
         Icon = Color3.fromHex("#E2DDE0"),
         Toggle = Color3.fromHex("#A1162F"),
         Slider = Color3.fromHex("#A1162F"),
-        Checkbox = Color3.fromHex("#D23A57"),
+        Checkbox = Color3.fromHex("#A1162F"),
         Primary = Color3.fromHex("#A1162F"),
         SliderIcon = Color3.fromHex("#F1E3E7"),
         PanelBackground = Color3.fromHex("#050406"),
@@ -450,6 +489,18 @@ local function attachCrimsonAmbient(window)
 end
 
 local ActiveWindows = setmetatable({}, { __mode = "k" })
+if type(getgenv) == "function" then
+    local ok, environment = pcall(getgenv)
+    if ok and type(environment) == "table" then
+        environment.__VANTAUI_CLEANUP = function()
+            for window in pairs(ActiveWindows) do
+                if window and not window.Destroyed and type(window.Destroy) == "function" then
+                    pcall(window.Destroy, window)
+                end
+            end
+        end
+    end
+end
 
 local function applyThemeWallpaper(window, themeName)
     if not window or window.Destroyed or not window._UsesVantaThemeWallpaper then
@@ -601,6 +652,10 @@ function VantaUI:CreateWindow(config)
     config.HideSearchBar = true
     if config.Size == nil then
         config.Size = UDim2.fromOffset(620, 420)
+    end
+    -- Keep explicit shadow preferences; suppress only the default dark rim.
+    if config.ShadowTransparency == nil then
+        config.ShadowTransparency = 1
     end
 
     applyDefaultBranding(config)
