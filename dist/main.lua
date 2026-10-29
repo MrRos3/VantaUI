@@ -5,7 +5,7 @@
    \ V / (_| | | | | || (_| | |_| || |
     \_/ \__,_|_| |_|\__\__,_|\___/|___|
 
-    v0.3.8  |  2026-10-24  |  VantaUI - polished AMOLED-first Roblox UI library by MrRos3
+    v0.3.8  |  2026-10-29  |  VantaUI - polished AMOLED-first Roblox UI library by MrRos3
 
     Source: https://github.com/MrRos3/VantaUI
     Project: VantaUI by MrRos3
@@ -2401,6 +2401,16 @@ ImageColor3=Color3.fromHex"#251016",
 ImageTransparency=0,
 })
 
+
+d("UIGradient",{
+Name="PremiumCountdownGradient",Parent=m,
+Color=ColorSequence.new{
+ColorSequenceKeypoint.new(0,Color3.fromRGB(105,105,105)),
+ColorSequenceKeypoint.new(0.45,Color3.new(1,1,1)),
+ColorSequenceKeypoint.new(1,Color3.fromRGB(145,145,145)),
+},
+})
+b.AddThemeObject(m,{ImageColor3="Primary"})
 local p=d("Frame",{
 Size=UDim2.new(1,h.Icon and-28-f.UIPadding or 0,1,0),
 Position=UDim2.new(1,0,0,0),
@@ -2506,7 +2516,9 @@ i,
 l,
 })
 
-local u=d("Frame",{
+local u
+if i then u=d("UIScale",{Name="PremiumIconScale",Scale=0.75,Parent=i})end
+local v=d("Frame",{
 BackgroundTransparency=1,
 Size=UDim2.new(1,0,0,0),
 Parent=g.Holder,
@@ -2514,11 +2526,11 @@ Parent=g.Holder,
 r,
 })
 
-function h.Close(v)
+function h.Close(x)
 if not h.Closed then
 h.Closed=true
 e(
-u,
+v,
 0.45,
 {Size=UDim2.new(1,0,0,-8)},
 Enum.EasingStyle.Quint,
@@ -2526,20 +2538,30 @@ Enum.EasingDirection.Out
 ):Play()
 e(r,0.55,{Position=UDim2.new(2,0,1,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 task.wait(0.45)
-u:Destroy()
+v:Destroy()
 end
 end
 
 task.spawn(function()
 task.wait()
 e(
-u,
+v,
 0.45,
 {Size=UDim2.new(1,0,0,r.AbsoluteSize.Y)},
 Enum.EasingStyle.Quint,
 Enum.EasingDirection.Out
 ):Play()
-e(r,0.45,{Position=UDim2.new(0,0,1,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+e(r,b.PremiumReduceMotion and 0.12 or 0.55,
+{Position=UDim2.new(0,0,1,0)},
+b.PremiumReduceMotion and Enum.EasingStyle.Sine or Enum.EasingStyle.Back,
+Enum.EasingDirection.Out):Play()
+if u then
+if b.PremiumReduceMotion then u.Scale=1
+else
+e(u,0.42,{Scale=1},Enum.EasingStyle.Back,
+Enum.EasingDirection.Out):Play()
+end
+end
 if h.Duration then
 m.Size=UDim2.new(0,r.DurationFrame.AbsoluteSize.X,1,0)
 e(
@@ -16311,7 +16333,7 @@ aa.Themes=a.load'w'(aa,as)
 
 aa.Themes["Salty Special"]={
 Name="Salty Special",
-Accent=Color3.fromHex"#12070A",
+Accent=Color3.fromHex"#A1162F",
 Dialog=Color3.fromHex"#0A0709",
 Outline=Color3.fromHex"#5A1824",
 Text=Color3.fromHex"#FFFFFF",
@@ -16321,7 +16343,7 @@ Button=Color3.fromHex"#251016",
 Icon=Color3.fromHex"#E2DDE0",
 Toggle=Color3.fromHex"#A1162F",
 Slider=Color3.fromHex"#A1162F",
-Checkbox=Color3.fromHex"#D23A57",
+Checkbox=Color3.fromHex"#A1162F",
 Primary=Color3.fromHex"#A1162F",
 SliderIcon=Color3.fromHex"#F1E3E7",
 PanelBackground=Color3.fromHex"#050406",
