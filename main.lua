@@ -432,63 +432,20 @@ local function attachCrimsonAmbient(window)
         end
     end
 
-    local connection
-    connection = RunService.RenderStepped:Connect(function(dt)
+    -- Static wallpaper. The old version animated all ~50 particles on RenderStepped,
+    -- reallocating a UDim2 (and more) per particle every frame. That constant garbage
+    -- made the collector pause every few seconds, which froze the game. The particles
+    -- are now scattered once and left in place; visibility follows the window with no
+    -- per-frame work and no allocations.
+    overlay.Visible = not window.Closed and main.Visible
+    local visConn
+    visConn = main:GetPropertyChangedSignal("Visible"):Connect(function()
         if window.Destroyed or not overlay.Parent then
-            if connection then connection:Disconnect(); connection = nil end
+            if visConn then visConn:Disconnect(); visConn = nil end
             if overlay.Parent then overlay:Destroy() end
             return
         end
-        if window.Closed or not main.Visible then
-            overlay.Visible = false
-            frameAccumulator = 0
-            return
-        end
-        overlay.Visible = true
-        -- Hold particles in place during minimize; never jump ahead on reopening.
-        frameAccumulator = frameAccumulator + math.min(tonumber(dt) or 1 / 60, 0.075)
-        if frameAccumulator < (1 / CRIMSON_AMBIENT_FPS) then return end
-        elapsed = elapsed + frameAccumulator
-        frameAccumulator = 0
-
-        for _, p in ipairs(particles) do
-            local t = elapsed
-            local positionX, positionY, alpha
-            if p.kind == "Petal" then
-                local progress = (t * p.rate + p.phase) % 1
-                positionX = p.x + p.drift * progress
-                    + p.sway * math.sin(t * 0.85 + p.phase * 9)
-                positionY = -0.10 + 1.19 * progress
-                -- Fade at the very top and bottom to prevent popping.
-                alpha = math.min(0.94, p.alpha +
-                    0.32 * math.abs(2 * progress - 1) +
-                    0.08 * math.sin(t * p.pulse + p.phase * 11))
-                p.item.Rotation = (t * p.rotation + p.phase * 360) % 360
-            elseif p.kind == "Ember" then
-                local progress = (t * p.rate + p.phase) % 1
-                positionX = p.x + p.drift * progress * 0.55
-                    + p.sway * math.sin(t * 1.8 + p.phase * 8)
-                positionY = 1.08 - 1.18 * progress
-                alpha = math.min(0.94, p.alpha +
-                    0.45 * math.abs(2 * progress - 1) +
-                    0.08 * math.sin(t * p.pulse + p.phase * 7))
-                p.item.Rotation = 12 * math.sin(t * 1.3 + p.phase * 8)
-            elseif p.kind == "Mote" then
-                positionX = p.x + p.sway * math.sin(t * p.rate + p.phase * 6)
-                positionY = p.y + (p.sway * 0.65)
-                    * math.cos(t * p.rate * 0.8 + p.phase * 8)
-                local pulse = 0.5 + 0.5 * math.sin(t * p.pulse + p.phase * 11)
-                alpha = 0.94 - 0.10 * pulse
-                p.core.BackgroundTransparency = 0.73 - 0.37 * pulse
-            else
-                positionX = p.x + 0.009 * math.sin(t * p.rate + p.phase * 13)
-                positionY = p.y + 0.009 * math.cos(t * p.rate + p.phase * 11)
-                local pulse = math.max(0, math.sin(t * p.pulse + p.phase * 16))
-                alpha = 0.96 - 0.43 * pulse * pulse
-            end
-            p.item.Position = UDim2.fromScale(positionX, positionY)
-            p.item.BackgroundTransparency = math.clamp(alpha, 0.05, 0.99)
-        end
+        overlay.Visible = main.Visible and not window.Closed
     end)
     return overlay
 end
